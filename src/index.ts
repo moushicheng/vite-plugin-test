@@ -1,34 +1,51 @@
-import { config } from 'process';
-import { build, Plugin } from 'vite'
-export interface Options{
+import { config } from "process";
+import { build, Plugin } from "vite";
+export interface Options {}
 
-}
-
-export default function (_options:Options ={}): Plugin {
+export default function TestPlugin(_options: Options = {}): Plugin {
   return {
-    name: 'vite-plugin-test',
-    enforce:'pre',
-    buildStart(options){
-      console.log('@options');   
+    name: "vite-plugin-test",
+    // enforce: "pre",
+    buildStart(options) {
+      console.log("@buildStart");
     },
-    resolveId(source){
-      if(source=='virtual-module')return source
-      console.log('@resolveId',source);
+    options(options) {
+      console.log("@options");
+    },
+    resolveId(source) {
+      console.log("@resolveId", source);
+      if (source == "virtual-module") return source;
     },
     transform(code, id) {
-       console.log('@transform: ',id);
+      console.log("@transform: ", idParser(id));
     },
-    load(id){
-      if(id=='virtual-module'){
-        return 'export default "This is virtual-module!"'
+    load(id) {
+      console.log("@load: ", idParser(id));
+      if (id == "virtual-module") {
+        return 'export default "This is virtual-module!"';
       }
-      console.log('@load: ',id);
     },
-    buildEnd(){
-      console.log('@buildEnd');
+    buildEnd() {
+      console.log("@buildEnd");
     },
-    config(cfg){
-      console.log('@config:',cfg);
-    }
-  }
+    config(config) {
+      console.log("@config:");
+    },
+    configResolved(config) {
+      console.log("@configResolved");
+    },
+    configureServer(server) {
+      console.log("@configureServer", typeof server);
+    },
+    configurePreviewServer(server) {
+      console.log("@configurePreviewServer");
+    },
+    transformIndexHtml(html) {
+      console.log("@transformIndexHtml");
+    },
+  };
+}
+function idParser(id:string){
+  const sites=id.split('/');
+  return `.../${sites[sites.length-2]}/${sites[sites.length-1]}`
 }
